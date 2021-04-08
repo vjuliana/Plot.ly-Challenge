@@ -1,4 +1,21 @@
-// Use D3 fetch to read the JSON file
+// STEP 1: PLOTLY
+
+// Initializes the page with a default plot
+function init() {
+  data = [{
+    x: [],
+    y: []
+  }];
+  
+  var barChart = d3.selectAll("#bar").node();
+
+  Plotly.newPlot(barChart)
+  }
+
+  // Call updatePlotly() when a change takes place to the DOM
+  d3.selectAll("body").on("change", updatePlotly);
+
+// Create a horizontal bar chart with a drop down menu to display the top 10 OTUs found in that individual 
 
 function unpack(rows, index) {
     return rows.map(function(row) {
@@ -6,43 +23,42 @@ function unpack(rows, index) {
     });
   }
 
-function buildBarChart() {
-  d3.json("./data/samples.json").then(function(data) {
+function buildBarChart(sampleID) {
+// Use D3 fetch to read the JSON file
+  d3.json("data/samples.json").then(function(data) {
     console.log(data);
 
-    // Step 1: Grab values from the json objects sample_values, otu_ids, otu_labels
-    var sample_values = data.samples.sample_values;
-    var otu_ids = data.samples.otu_ids; 
-    var otu_lables = data.samples.otu_labels;
+    // Step 1: Filter sample values by ID
+    var samples = data.samples.filter(samples => parseInt(samples.id) === sampleID);
 
-    // Step 2: Sort sample values by descending order
-    // Upon checking data, the sample values and corresponding otu_ids and otu_labels are already in descending order
+    console.log(samples);
 
-    // Step 3: Slice the top 10 objects for plotting and reverse array due to Plotly's defaults
-    sample_values = sample_values.slice(0, 9).reverse();
-    otu_ids = otu_ids.slice(0, 9).reverse();
-    otu_lables = otu_lables.slice(0, 9).reverse();
+    // Step 2: Slice the top 10 objects for plotting and reverse array due to Plotly's defaults
+    var topSampleValues = samples.sample_values.slice(0, 10).reverse();
+    var topOtuIDs = sample.otu_ids.slice(0, 10).reverse();
+    var topOtuLabels = sample.otu_lables.slice(0, 10).reverse();
+
+    console.log(`Top 10 Sample: ${topSampleValues}`)
+    console.log(`Top 10 Otu ID: ${topOtuIDs}`)
+    console.log(`Top 10 Otu Labels: ${topOtuLabels}`)
 
     // Step 4: Create trace
-    var trace = {
+    var traceBarChart = {
       x: sample_values,
       y: otu_ids,
+      text: topOtuLabels,
       type: "bar",
       orientation: "h"
     };
 
-    // data
-    var data = [trace];
+    // Data
+    var dataBarChart = [traceBarChart];
 
     // Layout
-    var layout = {
-
-    }
+    // var layout = { }
 
     // Render plot
-    Plotly.newPlot("bar", data);
+    Plotly.newPlot("bar", dataBarChart);
 
   });
 };
-
-buildBarChart();
