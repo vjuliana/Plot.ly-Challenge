@@ -1,7 +1,7 @@
 // STEP 1: INITIALISE 
 
 // Initializes the page with a default plot
-function init() {
+//function init() {
 //   data = [{
 //     x: [1, 2, 3, 4, 5],
 //     y: [1, 2, 4, 8, 16] }];
@@ -28,47 +28,45 @@ function init() {
 //     var x = [];
 //     var y = [];
 
-};
+//};
 
-init();
+//init();
 
-// STEP 2: Use D3 fetch to read the JSON file and display h-bar and bubble chart
+// Building horizontal bar chart and bubble chart
 
-function buildPlots(sampleID) {
-  d3.json("samples.json").then((data => {
+function BuildCharts(sampleID) {
+  d3.json("../data/samples.json").then((data) => {
     console.log(data);
     // console.log(data.samples);
    
     // Filter sample values by ID
     // var filteredSample = data.samples.filter(d => d.id == sampleID)[0]
-    var samplesData = data.samples;
-    var filteredSample = samplesData.filter(d => d.id == sampleID)[0];
+    
+    var samples = data.samples;
+    // console.log(samplesData);
 
+    var filteredArray = samples.filter(d => d.id == sampleID);
+    // console.log(filteredArray);
+
+    var filteredSample = filteredArray[0];
     console.log(filteredSample);
 
-    // Slice the top 10 objects for plotting and reverse array due to Plotly's defaults
-    var top10SampleValues = filteredSample.sample_values.slice(0,10).reverse();
-    var top10OtuIDs = filteredSample.otu_ids.slice(0,10).reverse();
-    var top10OtuLabels = filteredSample.otu_lables.slice(0,10).reverse();
+    // Grab data for 'sample_values', 'otu_ids' and 'otu_labels'
+    var SampleValues = filteredSample.sample_values;
+    var OtuIDs = filteredSample.otu_ids;
+    var OtuLabels = filteredSample.otu_lables;
 
-    console.log(`Top 10 Sample: ${top10SampleValues}`);
-    console.log(`Top 10 Otu ID: ${top10OtuIDs}`);
-    console.log(`Top 10 Otu Labels: ${top10OtuLabels}`);
+    console.log(`Sample Values: ${SampleValues}`);
+    console.log(`Otu IDs: ${OtuIDs}`);
+    console.log(`Otu Labels: ${OtuLabels}`);
 
-    // Get the otu_id's into string
-    var yticks = top10OtuIDs.map(d => "OTU " + d);
-
-    console.log(`Otu ID String: ${OtuIDstring}`);
-
-
-
-    // Create trace
+    // Create trace for bar chart, slice object to get top 10 values and reverse
     var traceBarChart = {
-      x: top10SampleValues,
-      y: yticks.reverse(),
-      text: topOtuLabels,
-      type: "bar",
-      orientation: "h"
+      x: SampleValues.slice(0,10).reverse(),
+      y: OtuIDs.slice(0,10).map(d => "OTU " + d).reverse(),
+      text: OtuLabels.slice(0,10).reverse(),
+      type: 'bar',
+      orientation: 'h'
     };
 
     // Data
@@ -84,19 +82,69 @@ function buildPlots(sampleID) {
 
     // Render plot
     Plotly.newPlot("bar", dataBarChart, barLayout);
-  }));
+
+    // Create trace for bubble chart 
+    var traceBubbleChart = {
+      x: OtuIDs,
+      y: SampleValues,
+      mode: 'markers',
+      marker: {
+        color: SampleValues,
+        size: OtuIDs,
+        },
+      type: 'scatter'
+      };
+
+    // Data
+    var dataBubbleChart = [traceBubbleChart];
+
+    // Layout
+    var bubbleLayout = {
+      title: 'Belly Button Microbial Species',
+      xaxis: {title: 'Microbial Species ID'},
+      yaxis: {title: 'No. of samples found'},
+      // margin: {}
+      };
+  
+    // Render plot
+    Plotly.newPlot("bubble", dataBubbleChart, bubbleLayout);
+
+  });
 };
 
-buildPlots();
+// Initialises BuildChart function
+BuildCharts();
 
-function displayDemoInfo() {
-  d3.json("samples.json").then((data => {
+// Building Demographic Info Box
+
+function displayDemoInfo(sampleID) {
+  d3.json("../data/samples.json").then((data) => {
     console.log(data);
 
-    // Map metadata for demographic info
-    var metadataInfo = data.metadata.map(d => d.wfreq)
-    console.log(`Washing Freq: ${metadataInfo}`)
-  }));
+    // Filter metadata for demographic info by ID
+    var metadata = data.metadata
+    console.log(metadata)
+    
+    var metadataArray = metadata.filter(d => d.id == sampleID);
+    console.log(metadataArray);
+
+    var metadataInfo = metadataArray[0];
+    console.log(metadataInfo);
+
+    // Select where to put demographic info 
+    var demoinfoBox = d3.select("#sample-metadata");
+
+    // Reset if new ID is chosen
+    demoinfoBox.html("");
+
+    // Grab key value pairs and append to the box
+    Object.entries(metadataInfo).forEach(([key, value]) => {
+      console.log(`Key: ${key} and Value ${value}`);
+      demoinfoBox.append("h3").text(`${key}: ${value}`);
+      console.log(demoinfoBox);
+    };
+
+  });
 };
 
 displayDemoInfo();
