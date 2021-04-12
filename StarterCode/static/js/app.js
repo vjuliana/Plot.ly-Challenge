@@ -1,38 +1,6 @@
-// STEP 1: INITIALISE 
+// BELLY BUTTON CHALLENGE //
 
-// Initializes the page with a default plot
-//function init() {
-//   data = [{
-//     x: [1, 2, 3, 4, 5],
-//     y: [1, 2, 4, 8, 16] }];
-
-//   var CHART = d3.selectAll("#selDataset").node();
-
-//   Plotly.newPlot(CHART, data);
-// }
-
-// // Call updatePlotly() when a change takes place to the DOM
-// d3.selectAll("#selDataset").on("change", updatePlotly);
-
-// // This function is called when a dropdown menu item is selected
-// function updatePlotly() {
-//   // Use D3 to select the dropdown menu
-//   var dropdownMenu = d3.select("#selDataset");
-
-//   // Assign the value of the dropdown menu option to a variable
-//   var dataset = dropdownMenu.node().value;
-
-//   var CHART = d3.selectAll("#plot").node();
-
-//     // Initialize x and y arrays
-//     var x = [];
-//     var y = [];
-
-//};
-
-//init();
-
-// Building horizontal bar chart and bubble chart
+// Build horizontal bar chart and bubble chart //
 
 function BuildCharts(sampleID) {
   d3.json("../data/samples.json").then((data) => {
@@ -60,6 +28,7 @@ function BuildCharts(sampleID) {
     console.log(`Otu IDs: ${OtuIDs}`);
     console.log(`Otu Labels: ${OtuLabels}`);
 
+    // BAR CHART //
     // Create trace for bar chart, slice object to get top 10 values and reverse
     var traceBarChart = {
       x: SampleValues.slice(0,10).reverse(),
@@ -69,10 +38,10 @@ function BuildCharts(sampleID) {
       orientation: 'h'
     };
 
-    // Data
+    // Data for bar chart
     var dataBarChart = [traceBarChart];
 
-    // Layout
+    // Layout for bar chart
     var barLayout = {
       title: 'Top 10 Microbial Species Found in an Individual',
       xaxis: {title: 'No. of samples found'},
@@ -80,9 +49,10 @@ function BuildCharts(sampleID) {
       // margin: {}
     };
 
-    // Render plot
+    // Render bar chart
     Plotly.newPlot("bar", dataBarChart, barLayout);
 
+    // BUBBLE CHART //
     // Create trace for bubble chart 
     var traceBubbleChart = {
       x: OtuIDs,
@@ -95,10 +65,10 @@ function BuildCharts(sampleID) {
       type: 'scatter'
       };
 
-    // Data
+    // Data for bubble chart
     var dataBubbleChart = [traceBubbleChart];
 
-    // Layout
+    // Layout for bubble chart
     var bubbleLayout = {
       title: 'Belly Button Microbial Species',
       xaxis: {title: 'Microbial Species ID'},
@@ -106,16 +76,16 @@ function BuildCharts(sampleID) {
       // margin: {}
       };
   
-    // Render plot
+    // Render bubble chart
     Plotly.newPlot("bubble", dataBubbleChart, bubbleLayout);
 
   });
 };
 
-// Initialises BuildChart function
+// Initialise BuildChart function
 BuildCharts();
 
-// Building Demographic Info Box
+// Building Demographic Info Box //
 
 function displayDemoInfo(sampleID) {
   d3.json("../data/samples.json").then((data) => {
@@ -142,9 +112,54 @@ function displayDemoInfo(sampleID) {
       console.log(`Key: ${key} and Value ${value}`);
       demoinfoBox.append("h3").text(`${key}: ${value}`);
       console.log(demoinfoBox);
-    };
-
+    });
   });
 };
 
 displayDemoInfo();
+
+// Initialise first the page with a default plot //
+
+function init() {
+  // Use D3 to select the dropdown menu
+  var dropdownMenu = d3.selectAll("#selDataset").node();
+
+  // Assign the value of the dropdown menu to a variable
+  d3.json("../data/samples.json").then((data) => {
+    var names = data.names;
+    // console.log(names);
+    
+    data.names.forEach((sampleID) => {
+      dropdownMenu.append("option").text(sampleID).property("value");
+    });
+
+  // Initial array
+  var startingsampleID = names[0];
+  console.log(`Starting sample ID: ${startingsampleID}`);
+
+  // Display default demographic info and charts
+  displayDemoInfo(startingsampleID);
+  BuildCharts(startingsampleID);
+  
+  });
+};
+
+init();
+
+// Event listener
+
+// Call selectNewTestSubject() when a change takes place to the DOM
+d3.selectAll("#selDataset").on("change", selectNewTestSubject);
+
+function selectNewTestSubject(sampleID) {
+  //  Call function to update chart
+  BuildCharts(sampleID);
+
+  // Call function to update Demographic Info box
+  displayDemoInfo(sampleID);
+
+  };
+
+selectNewTestSubject();
+
+
