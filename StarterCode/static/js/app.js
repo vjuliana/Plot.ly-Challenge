@@ -6,12 +6,13 @@ function BuildCharts(sampleID) {
   d3.json("../data/samples.json").then((data) => {
     console.log(data);
     // console.log(data.samples);
-   
+
     // Filter sample values by ID
     // var filteredSample = data.samples.filter(d => d.id == sampleID)[0]
-    
+
     var samples = data.samples;
     // console.log(samplesData);
+    console.log(sampleID);
 
     var filteredArray = samples.filter(d => d.id == sampleID);
     // console.log(filteredArray);
@@ -22,7 +23,7 @@ function BuildCharts(sampleID) {
     // Grab data for 'sample_values', 'otu_ids' and 'otu_labels'
     var SampleValues = filteredSample.sample_values;
     var OtuIDs = filteredSample.otu_ids;
-    var OtuLabels = filteredSample.otu_lables;
+    var OtuLabels = filteredSample.otu_labels;
 
     console.log(`Sample Values: ${SampleValues}`);
     console.log(`Otu IDs: ${OtuIDs}`);
@@ -31,9 +32,9 @@ function BuildCharts(sampleID) {
     // BAR CHART //
     // Create trace for bar chart, slice object to get top 10 values and reverse
     var traceBarChart = {
-      x: SampleValues.slice(0,10).reverse(),
-      y: OtuIDs.slice(0,10).map(d => "OTU " + d).reverse(),
-      text: OtuLabels.slice(0,10).reverse(),
+      x: SampleValues.slice(0, 10).reverse(),
+      y: OtuIDs.slice(0, 10).map(d => "OTU " + d).reverse(),
+      text: OtuLabels.slice(0, 10).reverse(),
       type: 'bar',
       orientation: 'h'
     };
@@ -44,8 +45,12 @@ function BuildCharts(sampleID) {
     // Layout for bar chart
     var barLayout = {
       title: 'Top 10 Microbial Species Found in an Individual',
-      xaxis: {title: 'No. of samples found'},
-      yaxis: {title: 'Microbial Species ID'},
+      xaxis: {
+        title: 'No. of samples found'
+      },
+      yaxis: {
+        title: 'Microbial Species ID'
+      },
       // margin: {}
     };
 
@@ -61,9 +66,9 @@ function BuildCharts(sampleID) {
       marker: {
         color: SampleValues,
         size: OtuIDs,
-        },
+      },
       type: 'scatter'
-      };
+    };
 
     // Data for bubble chart
     var dataBubbleChart = [traceBubbleChart];
@@ -71,11 +76,15 @@ function BuildCharts(sampleID) {
     // Layout for bubble chart
     var bubbleLayout = {
       title: 'Belly Button Microbial Species',
-      xaxis: {title: 'Microbial Species ID'},
-      yaxis: {title: 'No. of samples found'},
+      xaxis: {
+        title: 'Microbial Species ID'
+      },
+      yaxis: {
+        title: 'No. of samples found'
+      },
       // margin: {}
-      };
-  
+    };
+
     // Render bubble chart
     Plotly.newPlot("bubble", dataBubbleChart, bubbleLayout);
 
@@ -83,7 +92,7 @@ function BuildCharts(sampleID) {
 };
 
 // Initialise BuildChart function
-BuildCharts();
+// BuildCharts("940");
 
 // Building Demographic Info Box //
 
@@ -94,7 +103,7 @@ function displayDemoInfo(sampleID) {
     // Filter metadata for demographic info by ID
     var metadata = data.metadata
     console.log(metadata)
-    
+
     var metadataArray = metadata.filter(d => d.id == sampleID);
     console.log(metadataArray);
 
@@ -116,31 +125,31 @@ function displayDemoInfo(sampleID) {
   });
 };
 
-displayDemoInfo();
+// displayDemoInfo("940");
 
 // Initialise first the page with a default plot //
 
 function init() {
   // Use D3 to select the dropdown menu
-  var dropdownMenu = d3.selectAll("#selDataset").node();
+  var dropdownMenu = d3.select("#selDataset");
 
   // Assign the value of the dropdown menu to a variable
   d3.json("../data/samples.json").then((data) => {
     var names = data.names;
     // console.log(names);
-    
+
     data.names.forEach((sampleID) => {
       dropdownMenu.append("option").text(sampleID).property("value");
     });
 
-  // Initial array
-  var startingsampleID = names[0];
-  console.log(`Starting sample ID: ${startingsampleID}`);
+    // Initial array
+    var startingsampleID = names[0];
+    console.log(`Starting sample ID: ${startingsampleID}`);
 
-  // Display default demographic info and charts
-  displayDemoInfo(startingsampleID);
-  BuildCharts(startingsampleID);
-  
+    // Display default demographic info and charts
+    displayDemoInfo(startingsampleID);
+    BuildCharts(startingsampleID);
+
   });
 };
 
@@ -158,8 +167,6 @@ function selectNewTestSubject(sampleID) {
   // Call function to update Demographic Info box
   displayDemoInfo(sampleID);
 
-  };
+};
 
-selectNewTestSubject();
-
-
+// selectNewTestSubject();
