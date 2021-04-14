@@ -65,7 +65,8 @@ function BuildCharts(sampleID) {
       mode: 'markers',
       marker: {
         color: SampleValues,
-        size: OtuIDs,
+        size: SampleValues,
+        colorscale: 'Portland'
       },
       type: 'scatter'
     };
@@ -158,7 +159,7 @@ init();
 // Event listener
 
 // Call selectNewTestSubject() when a change takes place to the DOM
-d3.selectAll("#selDataset").on("change", selectNewTestSubject);
+d3.selectAll("#selDataset").on("optionChanged", selectNewTestSubject);
 
 function selectNewTestSubject(sampleID) {
   //  Call function to update chart
